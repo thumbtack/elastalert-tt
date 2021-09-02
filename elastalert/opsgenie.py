@@ -187,28 +187,29 @@ class OpsGenieAlerter(Alerter):
 
     def resolve(self):
         if self.opsgenie_resolve_alert == True:
-            #build opsgenie result, use alias to resolv open alerts
+            #build opsgenie result, use alias to resolve open alerts
             post = {'note' : 'OK-Elastalert Auto Resolving'}
 
             logging.debug(json.dumps(post))
 
             headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'GenieKey {}'.format(self.api_key),
+                'Content-Type': 'application/json',
+                'Authorization': 'GenieKey {}'.format(self.api_key),
             }
             # set https proxy, if it was provided
             proxies = {'https': self.opsgenie_proxy} if self.opsgenie_proxy else None
 
             try:
-                r = requests.post(self.to_addr.__add__('/').__add__(self.alias).__add__('/close?identifierType=alias'), json=post, headers=headers, proxies=proxies)
+                addr = '{}/{}/close?identifierType=alias'.format(self.to_addr, self.alias)
+                r = requests.post(addr, json=post, headers=headers, proxies=proxies)
 
                 logging.debug('request response: {0}'.format(r))
                 if r.status_code != 202:
                     elastalert_logger.info("Error response from {0} \n "
                                            "API Response: {1}".format(self.to_addr, r))
                     r.raise_for_status()
-                elastalert_logger.info("Auto Resolve Alert sent to OpsGenie")
+                logging.info("Auto Resolve Alert sent to OpsGenie")
             except Exception as err:
                 raise EAException("Error sending alert: {0}".format(err))
         else:
-            elastalert_logger.info("Alert not sent to Opsgenie as resolve alert is not set")
+            logging.info("Alert not sent to Opsgenie as resolve alert is not set")

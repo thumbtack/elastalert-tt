@@ -506,7 +506,7 @@ class EmailAlerter(Alerter):
             to_addr = self.rule['email']
             if 'email_from_field' in self.rule:
                 recipient = lookup_es_key(matches[0], self.rule['email_from_field'])
-                if isinstance(recipient, basestring):
+                if isinstance(recipient, str):
                     if '@' in recipient:
                         to_addr = [recipient]
                     elif 'email_add_domain' in self.rule:

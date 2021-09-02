@@ -35,6 +35,7 @@ from .ruletypes import FlatlineRule
 from .util import add_raw_postfix
 from .util import cronite_datetime_to_timestamp
 from .util import dt_to_ts
+from .util import dt_to_ts_no_ms
 from .util import dt_to_unix
 from .util import EAException
 from .util import elastalert_logger
@@ -1000,10 +1001,8 @@ class ElastAlerter(object):
                             alert.resolve()
                         except EAException as e:
                             self.handle_error('Error while resolving alert %s: %s' % (alert.get_info()['type'], e), {'rule': rule['name']})
-                            alert_exception = str(e)
                         else:
                             self.alerts_sent += 1
-                            alert_sent = True
         except (ElasticsearchException, KeyError) as e:
             self.handle_error('Error querying for last alerts: %s' % (e), {'rule': rule['name']})
             self.writeback_es = None
